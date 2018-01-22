@@ -7,7 +7,21 @@ library(ggplot2)
 setwd("d:/kaggle/titanic")
 
 d <- read.csv("train.csv")
-str(d)
+test <- read.csv("test.csv")
+str(test)
 summary(d)
 
-test <- read.csv("test.csv")
+# ----- decision tree -----
+library(rpart)
+library(rpart.plot)
+
+d$Name <- NULL
+d$Ticket <- NULL
+d$Cabin <- NULL
+
+m <- rpart(Survived~., d)
+rpart.plot(m)
+
+pred <- predict(m, test)
+a <- data.frame(PassengerId=test$PassengerId, Survived=round(pred))
+write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
