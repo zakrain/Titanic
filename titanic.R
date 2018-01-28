@@ -1,16 +1,28 @@
 # Kaggle:
 #   Titanic
 
-library(randomForest)
 library(ggplot2)
 
 setwd("d:/kaggle/titanic")
 
-train <- read.csv("train.csv")
-test <- read.csv("test.csv")
-str(test)
-summary(d)
+d_train <- read.csv("train.csv")
+d_test <- read.csv("test.csv")
 
+# TODO - 結合
+d <- rbind(train, test)
+d <- train
+
+str(d)
+summary(d)
+head(d)
+
+# TODO - 空白の欠損値 Cabin
+apply(is.na(d), 2, sum)
+
+# TODO - 相関
+cor(d)
+hist(d$Age)
+plot(d$Sex)
 
 # ----- Decision Tree -----
 library(rpart)
@@ -36,9 +48,6 @@ library(randomForest)
 d <- na.omit(d)
 d$Survived <- as.factor(d$Survived)
 m <- randomForest(Survived~., d)
-
-sapply(test, function(y) sum(is.na(y)))
-apply(is.na(test), 2, sum)
 
 d["Age"].fillna(d.Age.median(), inplace=True)
 
