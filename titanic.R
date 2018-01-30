@@ -1,7 +1,7 @@
 # Kaggle:
 #   Titanic
 
-library(ggplot2)
+library(psych)
 
 setwd("d:/kaggle/titanic")
 
@@ -18,6 +18,10 @@ head(d)
 
 # TODO - 空白の欠損値 Cabin
 apply(is.na(d), 2, sum)
+
+# 散布図行列
+pairs(d, panel=panel.smooth)
+pairs.panels(d)
 
 # TODO - 相関
 cor(d)
@@ -45,9 +49,18 @@ write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
 # ----- Random Forest -----
 library(randomForest)
 
+d <- read.csv("train.csv")
+test <- read.csv("test.csv")
+
+d$PassengerId <- NULL
+d$Name <- NULL
+d$Ticket <- NULL
+d$Cabin <- NULL
+
 d <- na.omit(d)
-d$Survived <- as.factor(d$Survived)
-m <- randomForest(Survived~., d)
+m <- randomForest(as.factor(Survived)~., d)
+m
+varImpPlot(m)
 
 d["Age"].fillna(d.Age.median(), inplace=True)
 
