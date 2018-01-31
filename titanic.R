@@ -5,8 +5,8 @@ library(psych)
 
 setwd("d:/kaggle/titanic")
 
-d_train <- read.csv("train.csv")
-d_test <- read.csv("test.csv")
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
 
 # TODO - 結合
 d <- rbind(train, test)
@@ -17,7 +17,8 @@ summary(d)
 head(d)
 
 # TODO - 空白の欠損値 Cabin
-apply(is.na(d), 2, sum)
+apply(is.na(train), 2, sum)
+apply(is.na(test), 2, sum)
 
 # 散布図行列
 pairs(d, panel=panel.smooth)
@@ -27,6 +28,9 @@ pairs.panels(d)
 cor(d)
 hist(d$Age)
 plot(d$Sex)
+
+# TODO - 生存率
+plot(as.factor(train$Survived))
 
 # ----- Decision Tree -----
 library(rpart)
