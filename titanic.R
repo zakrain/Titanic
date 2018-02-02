@@ -29,7 +29,17 @@ cor(d)
 hist(d$Age)
 plot(d$Sex)
 
-# TODO - 生存率
+# 生存率
+table(d$Survived)
+addmargins(round(prop.table(table(d$Survived))*100,2))
+
+addmargins(table(d$Sex,d$Survived))
+addmargins(round(prop.table(table(d$Sex, d$Survived))*100,2))
+
+addmargins(table(d$Pclass,d$Survived))
+addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
+
+# TODO - 生存率をグラフ化
 plot(as.factor(train$Survived))
 
 # ----- Decision Tree -----
