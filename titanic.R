@@ -1,24 +1,38 @@
 # Kaggle:
 #   Titanic
+#
+# - DATA
+# PassengerID:　乗客ID
+# Survived: 　　生存結果(0:No, 1:Yes)　
+# Pclass: 　　　乗客の階級(1:1st, 2:2nd, 3:3rc)
+# Name: 　　  　乗客の名前
+# Sex: 　　　　 性別
+# Age: 　　　　 年齢
+# SibSp 　　 　 兄弟、配偶者の数
+# Parch 　　　　両親、子供の数
+# Ticket 　　　 チケット番号
+# Fare 　　　　 乗船料金
+# Cabin 　　　　部屋番号
+# Embarked 　　 乗船した港(c:Cherbourg, Q:Queenstown, S:Southampton)
 
 library(psych)
 
 setwd("d:/kaggle/titanic")
 
-train <- read.csv("train.csv")
-test <- read.csv("test.csv")
+train <- read.csv("train.csv", na.strings = c("NA",""))
+test <- read.csv("test.csv", na.strings = c("NA",""))
 
-# TODO - 結合
+# 結合
+test$Survived <- NA
 d <- rbind(train, test)
-d <- train
 
 str(d)
 summary(d)
 head(d)
 
-# TODO - 空白の欠損値 Cabin
-apply(is.na(train), 2, sum)
-apply(is.na(test), 2, sum)
+# 欠損値 Cabin
+apply(is.na(d), 2, sum)
+sapply(all, function(x) {sum(is.na(x))})
 
 # 散布図行列
 pairs(d, panel=panel.smooth)
