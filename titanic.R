@@ -18,9 +18,8 @@
 library(psych)
 
 setwd("d:/kaggle/titanic")
-
-train <- read.csv("train.csv", na.strings = c("NA",""))
-test <- read.csv("test.csv", na.strings = c("NA",""))
+train <- read.csv("train.csv", stringsAsFactors=F, na.strings = c("NA",""))
+test <- read.csv("test.csv", stringsAsFactors=F, na.strings = c("NA",""))
 
 # 結合
 test$Survived <- NA
@@ -56,6 +55,9 @@ addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
 # TODO - 生存率をグラフ化
 plot(as.factor(train$Survived))
 
+# 称号(title)
+d$Title <- sapply(d$Name, function(x) {strsplit(x, split='[,.]')[[1]][2]})
+
 # ----- Decision Tree -----
 library(rpart)
 library(rpart.plot)
@@ -73,6 +75,7 @@ rpart.plot(m)
 pred <- predict(m, test)
 a <- data.frame(PassengerId=test$PassengerId, Survived=round(pred))
 write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
+
 
 # ----- Random Forest -----
 library(randomForest)
