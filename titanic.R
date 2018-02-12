@@ -33,6 +33,9 @@ head(d)
 apply(is.na(d), 2, sum)
 sapply(all, function(x) {sum(is.na(x))})
 
+# 称号(title)
+d$Title <- sapply(d$Name, function(x) {strsplit(x, split='[,.]')[[1]][2]})
+
 # 散布図行列
 pairs(d, panel=panel.smooth)
 pairs.panels(d)
@@ -54,9 +57,6 @@ addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
 
 # TODO - 生存率をグラフ化
 plot(as.factor(train$Survived))
-
-# 称号(title)
-d$Title <- sapply(d$Name, function(x) {strsplit(x, split='[,.]')[[1]][2]})
 
 # ----- Decision Tree -----
 library(rpart)
