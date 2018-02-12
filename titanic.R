@@ -37,27 +37,36 @@ sapply(d, function(x) {sum(is.na(x))})
 d$Title <- sapply(d$Name, function(x) {strsplit(x, split='[,.]')[[1]][2]})
 d$Title <- trimws(d$Title, "both")
 
-# 散布図行列
-pairs(d, panel=panel.smooth)
-pairs.panels(d)
+# クロス集計
+table(d$Pclass)
+d$Pclass <- as.factor(d$Pclass)
+table(d$Sex)
+d$Sex <- as.factor(d$Sex)
+table(d$Title)
+d$Title <- as.factor(d$Title)
+
+# 生存率
+table(d$Survived)
+addmargins(round(prop.table(table(d$Survived))*100,2))
+addmargins(table(d$Sex,d$Survived))
+addmargins(round(prop.table(table(d$Sex, d$Survived))*100,2))
+addmargins(table(d$Pclass,d$Survived))
+addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
+# TODO - 生存率をグラフ化
+plot(as.factor(train$Survived))
+
+# TODO - Ageの欠損値を補間
+tapply(d$Age, d$Title, mean)
+
 
 # TODO - 相関
 cor(d)
 hist(d$Age)
 plot(d$Sex)
 
-# 生存率
-table(d$Survived)
-addmargins(round(prop.table(table(d$Survived))*100,2))
-
-addmargins(table(d$Sex,d$Survived))
-addmargins(round(prop.table(table(d$Sex, d$Survived))*100,2))
-
-addmargins(table(d$Pclass,d$Survived))
-addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
-
-# TODO - 生存率をグラフ化
-plot(as.factor(train$Survived))
+# 散布図行列
+pairs(d, panel=panel.smooth)
+pairs.panels(d)
 
 # ----- Decision Tree -----
 library(rpart)
