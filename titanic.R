@@ -31,10 +31,11 @@ head(d)
 
 # 欠損値 Cabin
 apply(is.na(d), 2, sum)
-sapply(all, function(x) {sum(is.na(x))})
+sapply(d, function(x) {sum(is.na(x))})
 
 # 称号(title)
 d$Title <- sapply(d$Name, function(x) {strsplit(x, split='[,.]')[[1]][2]})
+d$Title <- trimws(d$Title, "both")
 
 # 散布図行列
 pairs(d, panel=panel.smooth)
