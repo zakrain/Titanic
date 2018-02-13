@@ -55,9 +55,17 @@ addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
 # TODO - 生存率をグラフ化
 plot(as.factor(train$Survived))
 
-# TODO - Ageの欠損値を補間
-tapply(d$Age, d$Title, mean)
-
+# TODO - 欠損値を補間
+a <- tapply(d$Age, d$Title, function(x) {mean(x, na.rm=T)})
+b <- d[is.na(d$Survived) & is.na(d$Age), "Title"]
+table(b)
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Master", "Age"] <- a["Master"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Miss", "Age"] <- a["Miss"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mr", "Age"] <- a["Mr"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mrs", "Age"] <- a["Mrs"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Ms", "Age"] <- a["Ms"]
+d[is.na(d$Fare),"Fare"] <- mean(d$Fare, na.rm=T)
+apply(is.na(d[is.na(d$Survived),]), 2, sum)
 
 # TODO - 相関
 cor(d)
@@ -97,13 +105,14 @@ d$PassengerId <- NULL
 d$Name <- NULL
 d$Ticket <- NULL
 d$Cabin <- NULL
+d$Embarked <- as.factor(d$Embarked)
 
 d <- na.omit(d)
-m <- randomForest(as.factor(Survived)~., d)
+m <- randomForest(as.factor(Survived)~., d[!is.na(d$Survived),])
 m
 varImpPlot(m)
 
 d["Age"].fillna(d.Age.median(), inplace=True)
 
-pred <- predict(m, test) 
-
+pred <- predict(m, d[is.na(d$Survived),])
+pred
