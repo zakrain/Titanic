@@ -38,11 +38,14 @@ d$Title <- sapply(d$Name, function(x) {strsplit(x, split='[,.]')[[1]][2]})
 d$Title <- trimws(d$Title, "both")
 
 # クロス集計
-table(d$Pclass)
-d$Pclass <- as.factor(d$Pclass)
 table(d$Sex)
-d$Sex <- as.factor(d$Sex)
+table(d$Pclass)
+table(d$Embarked)
 table(d$Title)
+
+d$Sex <- as.factor(d$Sex)
+d$Pclass <- as.factor(d$Pclass)
+d$Embarked <- as.factor(d$Embarked)
 d$Title <- as.factor(d$Title)
 
 # 生存率
@@ -52,8 +55,10 @@ addmargins(table(d$Sex,d$Survived))
 addmargins(round(prop.table(table(d$Sex, d$Survived))*100,2))
 addmargins(table(d$Pclass,d$Survived))
 addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
-# TODO - 生存率をグラフ化
+
+# TODO - グラフ化
 plot(as.factor(train$Survived))
+hist(d$Fare)
 
 # TODO - 欠損値を補間
 a <- tapply(d$Age, d$Title, function(x) {mean(x, na.rm=T)})
@@ -64,7 +69,7 @@ d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Miss", "Age"] <- a["Miss"]
 d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mr", "Age"] <- a["Mr"]
 d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mrs", "Age"] <- a["Mrs"]
 d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Ms", "Age"] <- a["Ms"]
-d[is.na(d$Fare),"Fare"] <- mean(d$Fare, na.rm=T)
+d[is.na(d$Fare),"Fare"] <- median(d$Fare, na.rm=T)
 apply(is.na(d[is.na(d$Survived),]), 2, sum)
 
 # TODO - 相関
@@ -80,20 +85,19 @@ pairs.panels(d)
 library(rpart)
 library(rpart.plot)
 
-d <- read.csv("train.csv")
-test <- read.csv("test.csv")
+train <- d[!is.na(d$Survived),]
+test <- d[is.na(d$Survived),]
 
-d$Name <- NULL
-d$Ticket <- NULL
-d$Cabin <- NULL
+train$Name <- NULL
+train$Ticket <- NULL
+train$Cabin <- NULL
 
-m <- rpart(Survived~., d)
+m <- rpart(Survived~., train)
 rpart.plot(m)
 
 pred <- predict(m, test)
 a <- data.frame(PassengerId=test$PassengerId, Survived=round(pred))
 write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
-
 
 # ----- Random Forest -----
 library(randomForest)
