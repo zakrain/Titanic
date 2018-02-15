@@ -48,6 +48,18 @@ d$Pclass <- as.factor(d$Pclass)
 d$Embarked <- as.factor(d$Embarked)
 d$Title <- as.factor(d$Title)
 
+# 欠損値を補間
+a <- tapply(d$Age, d$Title, function(x) {mean(x, na.rm=T)})
+b <- d[is.na(d$Survived) & is.na(d$Age), "Title"]
+table(b)
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Master", "Age"] <- a["Master"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Miss", "Age"] <- a["Miss"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mr", "Age"] <- a["Mr"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mrs", "Age"] <- a["Mrs"]
+d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Ms", "Age"] <- a["Ms"]
+d[is.na(d$Fare),"Fare"] <- median(d$Fare, na.rm=T)
+apply(is.na(d[is.na(d$Survived),]), 2, sum)
+
 # 生存率
 table(d$Survived)
 addmargins(round(prop.table(table(d$Survived))*100,2))
@@ -59,18 +71,6 @@ addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
 # TODO - グラフ化
 plot(as.factor(train$Survived))
 hist(d$Fare)
-
-# TODO - 欠損値を補間
-a <- tapply(d$Age, d$Title, function(x) {mean(x, na.rm=T)})
-b <- d[is.na(d$Survived) & is.na(d$Age), "Title"]
-table(b)
-d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Master", "Age"] <- a["Master"]
-d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Miss", "Age"] <- a["Miss"]
-d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mr", "Age"] <- a["Mr"]
-d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mrs", "Age"] <- a["Mrs"]
-d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Ms", "Age"] <- a["Ms"]
-d[is.na(d$Fare),"Fare"] <- median(d$Fare, na.rm=T)
-apply(is.na(d[is.na(d$Survived),]), 2, sum)
 
 # TODO - 相関
 cor(d)
@@ -102,21 +102,24 @@ write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
 # ----- Random Forest -----
 library(randomForest)
 
-d <- read.csv("train.csv")
-test <- read.csv("test.csv")
+train <- d[!is.na(d$Survived),]
+test <- d[is.na(d$Survived),]
 
-d$PassengerId <- NULL
-d$Name <- NULL
-d$Ticket <- NULL
-d$Cabin <- NULL
-d$Embarked <- as.factor(d$Embarked)
+train$PassengerId <- NULL
+train$Name <- NULL
+train$Ticket <- NULL
+train$Cabin <- NULL
 
-d <- na.omit(d)
-m <- randomForest(as.factor(Survived)~., d[!is.na(d$Survived),])
+train <- na.omit(train)
+m <- randomForest(as.factor(Survived)~., d=train)
 m
 varImpPlot(m)
 
-d["Age"].fillna(d.Age.median(), inplace=True)
-
-pred <- predict(m, d[is.na(d$Survived),])
+pred <- predict(m, test)
 pred
+a <- data.frame(PassengerId=test$PassengerId, Survived=pred)
+write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
+
+# ----- svM -----
+
+
