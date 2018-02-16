@@ -57,8 +57,13 @@ d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Miss", "Age"] <- a["Miss"]
 d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mr", "Age"] <- a["Mr"]
 d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Mrs", "Age"] <- a["Mrs"]
 d[is.na(d$Survived) & is.na(d$Age) & d$Title=="Ms", "Age"] <- a["Ms"]
-d[is.na(d$Fare),"Fare"] <- median(d$Fare, na.rm=T)
+
+d[is.na(d$Fare),]
+d[is.na(d$Fare), "Fare"] <- median(d[d$Pclass==3, "Fare"], na.rm=T)
+
 apply(is.na(d[is.na(d$Survived),]), 2, sum)
+
+# TODO - Fare == 0
 
 # 生存率
 table(d$Survived)
@@ -71,6 +76,11 @@ addmargins(round(prop.table(table(d$Pclass, d$Survived))*100,2))
 # TODO - グラフ化
 plot(as.factor(train$Survived))
 hist(d$Fare)
+
+train$Survived <- as.factor(train$Survived)
+plot(train$Pclass,train$Survived)
+plot(train$Sex, train$Survived)
+
 
 # TODO - 相関
 cor(d)
@@ -119,6 +129,9 @@ pred <- predict(m, test)
 pred
 a <- data.frame(PassengerId=test$PassengerId, Survived=pred)
 write.csv(a, "answer.csv", quote=FALSE, row.names=FALSE)
+
+# TODO - tuneRF
+
 
 # ----- svM -----
 
